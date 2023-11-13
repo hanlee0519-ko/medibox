@@ -1,0 +1,14 @@
+.container {
+  width: 100%;
+  height: 100%;
+  display: flex;
+}
+
+.logo {
+  width: 40%;
+  background-color: orange;
+}
+
+.signin {
+  width: 60%;
+}

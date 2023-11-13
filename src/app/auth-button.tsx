@@ -10,25 +10,18 @@ export default function AuthButton() {
   const router = useRouter();
   const supabase = createClientComponentClient();
 
-  const handleSignUp = async () => {
-    console.log('회원가입');
-    await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        emailRedirectTo: `${location.origin}/auth/callback`,
-      },
-    });
-    router.refresh();
-  };
-
   const handleSignIn = async () => {
     console.log('로그인');
     await supabase.auth.signInWithPassword({
-      email,
-      password,
+      email: email,
+      password: password,
     });
+    setPassword('');
     router.refresh();
+  };
+
+  const handleSignUp = async () => {
+    router.push('/signin');
   };
 
   return (
@@ -58,10 +51,12 @@ export default function AuthButton() {
           </div>
         </div>
         <div>
-          <button onClick={handleSignUp}>회원가입</button>
-        </div>
-        <div>
-          <button onClick={handleSignIn}>로그인</button>
+          <div>
+            <button onClick={handleSignIn}>로그인</button>
+          </div>
+          <div>
+            <button onClick={handleSignUp}>회원가입</button>
+          </div>
         </div>
       </div>
     </>
