@@ -4,8 +4,10 @@ import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { Session } from 'inspector';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
+import { PopUp } from './components/PopUp';
 
 export default function AuthInButton({ session }: { session: Session | null }) {
+  const [showPopUp, setShowPopUp] = useState(false);
   const [email, setEmail] = useState('');
   const [token, setToken] = useState('');
   const [password, setPassword] = useState('');
@@ -13,7 +15,6 @@ export default function AuthInButton({ session }: { session: Session | null }) {
   const supabase = createClientComponentClient();
 
   const handleSignUp = async () => {
-    console.log('회원가입');
     await supabase.auth.signInWithOtp({
       email: email,
       options: {
@@ -21,11 +22,11 @@ export default function AuthInButton({ session }: { session: Session | null }) {
       },
     });
     setEmail(email);
+    setShowPopUp((prev) => !prev);
     router.refresh();
   };
 
   const handleOTP = async () => {
-    console.log('OTP 인증');
     await supabase.auth.verifyOtp({
       email: email,
       token: token,
@@ -36,7 +37,6 @@ export default function AuthInButton({ session }: { session: Session | null }) {
   };
 
   const handleChangePassword = async () => {
-    console.log('비밀번호 초기화');
     await supabase.auth.updateUser({
       password: password,
     });
@@ -44,60 +44,73 @@ export default function AuthInButton({ session }: { session: Session | null }) {
     router.push('/login');
   };
 
-  return session ? (
+  return (
     <div>
-      <div>
-        <h1>인증완료, 비밀번호를 초기화 하세요</h1>
+      <div className="mt-8 p-8">
+        <h1>SIGN IN</h1>
         <input
-          className="border-solid border-2 border-black-600 text-black m-1 p-1"
+          className="w-11/12 border-solid border-2 border-black-600 text-black mt-4 m-1 p-1"
           name="email"
           placeholder="Email"
           onChange={(e) => setEmail(e.target.value)}
           value={email}
         />
+        <div>
+          <button
+            className="w-11/12 border-solid border-2 border-black-600 text-black m-1 p-1 hover:bg-amber-400 hover:text-white"
+            onClick={handleSignUp}
+          >
+            Sign In
+          </button>
+        </div>
       </div>
-      <div>
+
+      <PopUp
+        show={showPopUp}
+        onConfirm={handleChangePassword}
+        onCloseBtn={() => setShowPopUp((prev) => !prev)}
+        confirnName={'Rest Password'}
+      >
+        <h3>Email</h3>
         <input
-          className="border-solid border-2 border-black-600 text-black m-1 p-1"
-          type="password"
-          name="password"
-          placeholder="password"
-          onChange={(e) => setPassword(e.target.value)}
-          value={password}
-        />
-      </div>
-      <div>
-        <button onClick={handleChangePassword}>Reset Passowrd</button>
-      </div>
-    </div>
-  ) : (
-    <div>
-      <h1>이메일을 입력하고, 인증코드를 요청하세요</h1>
-      <div>
-        <input
-          className="border-solid border-2 border-black-600 text-black m-1 p-1"
-          name="email"
-          placeholder="Email"
-          onChange={(e) => setEmail(e.target.value)}
+          className="w-11/12 border-solid border-2 border-black-600 text-black m-1 p-1 bg-gray-300 "
+          type="text"
           value={email}
+          disabled
         />
-      </div>
-      <div>
-        <input
-          className="border-solid border-2 border-black-600 text-black m-1 p-1"
-          type="password"
-          name="OPT"
-          placeholder="OTP"
-          onChange={(e) => setToken(e.target.value)}
-          value={token}
-        />
-      </div>
-      <div>
-        <button onClick={handleSignUp}>Sign In</button>
-      </div>
-      <div>
-        <button onClick={handleOTP}>Verify</button>
-      </div>
+        {session ? (
+          <div>
+            <input
+              className="border-solid border-2 border-black-600 text-black m-1 p-1"
+              type="password"
+              name="password"
+              placeholder="password"
+              onChange={(e) => setPassword(e.target.value)}
+              value={password}
+            />
+          </div>
+        ) : (
+          <div className="mt-3">
+            <h3>OTP</h3>
+            <input
+              className="w-11/12 border-solid border-2 border-black-600 text-black m-1 p-1"
+              type="password"
+              name="OPT"
+              placeholder="OTP"
+              onChange={(e) => setToken(e.target.value)}
+              value={token}
+            />
+            <div>
+              <button
+                className="w-11/12 border-solid border-2 border-black-600 text-black m-1 p-1 hover:bg-amber-400 hover:text-white"
+                onClick={handleOTP}
+              >
+                Verify
+              </button>
+            </div>
+          </div>
+        )}
+      </PopUp>
     </div>
   );
 }

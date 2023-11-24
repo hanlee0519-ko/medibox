@@ -11,7 +11,6 @@ export default function AuthButton() {
   const supabase = createClientComponentClient();
 
   const handleSignIn = async () => {
-    console.log('로그인');
     await supabase.auth.signInWithPassword({
       email: email,
       password: password,
@@ -28,7 +27,7 @@ export default function AuthButton() {
     <>
       <div className="flex flex-col justify-center items-center	h-full">
         <div>icon</div>
-        <div>Medibox CDMS</div>
+        <div>Medibox Safety</div>
         <div>
           <div>
             <input
